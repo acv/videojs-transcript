@@ -396,12 +396,16 @@ var widget = function (plugin) {
       body.appendChild(fragment);
       body.setAttribute('lang', track.language);
     };
-    if (track.readyState !==2) {
-      track.load();
-      track.on('loaded', createTranscript);
-    } else {
-      createTranscript();
-    }
+    //if (track.readyState !==2) {
+      //track.load();
+     // track.addEventListener('loaded', createTranscript);
+   // } else {
+      if (!track.cues) {
+          window.setTimeout(function() { createTranscript(); }, 100);
+      } else {
+          createTranscript();
+      }
+   // }
     body.scroll = scroller(body);
     body.addEventListener('click', clickToSeekHandler);
     return body;
