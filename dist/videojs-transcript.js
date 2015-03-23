@@ -300,20 +300,26 @@ var trackList = function (plugin) {
     get: function () {
       var validTracks = [];
       my.tracks = my.player.textTracks();
-      my.tracks.forEach(function (track) {
-        if (track.kind() === 'captions' || track.kind() === 'subtitles') {
-          validTracks.push(track);
+      for (var index in my.tracks) {
+        var track = my.tracks[index];
+        if (track !== null && typeof track === 'object') {
+          if ('kind' in track) {
+            if (track.kind === 'captions' || track.kind === 'subtitles') {
+              validTracks.push(track);
+            }
+          }
         }
-      });
+      }
       return validTracks;
     },
     active: function (tracks) {
-      tracks.forEach(function (track) {
-        if (track.mode() === 2) {
+      for (var index in tracks) {
+        var track = my.tracks[index];
+        if (track.mode === 2 || track.mode === 'showing') {
           activeTrack = track;
           return track;
         }
-      });
+      };
       // fallback to first track
       return activeTrack || tracks[0];
     },
@@ -342,7 +348,7 @@ var widget = function (plugin) {
       plugin.validTracks.forEach(function (track, i) {
       var option = document.createElement('option');
       option.value = i;
-      option.textContent = track.label() + ' (' + track.language() + ')';
+      option.textContent = track.label + ' (' + track.language + ')';
       selector.appendChild(option);
     });
     selector.addEventListener('change', function (e) {
@@ -381,16 +387,16 @@ var widget = function (plugin) {
     var line, i;
     var fragment = document.createDocumentFragment();
     var createTranscript = function () {
-      var cues = track.cues();
+      var cues = track.cues;
       for (i = 0; i < cues.length; i++) {
         line = createLine(cues[i]);
         fragment.appendChild(line);
       }
       body.innerHTML = '';
       body.appendChild(fragment);
-      body.setAttribute('lang', track.language());
+      body.setAttribute('lang', track.language);
     };
-    if (track.readyState() !==2) {
+    if (track.readyState !==2) {
       track.load();
       track.on('loaded', createTranscript);
     } else {
